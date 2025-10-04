@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: discovery
+  profiles:
+    active: dev
+  config:
+    import: configserver:http://localhost:8070
+  cloud:
+    loadBalancer:
+      ribbon:
+        enabled: false

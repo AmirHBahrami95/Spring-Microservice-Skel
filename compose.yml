@@ -1,0 +1,77 @@
+services:
+  config:
+    deploy:
+      replicas: 1
+    build: config/
+    ports:
+      - target: 8070
+        published: 8070
+    networks: 
+      - ez_net
+
+  discovery:
+    deploy:
+      replicas: 1
+    build: discovery/
+    depends_on:
+      config:
+        condition: service_started
+    ports:
+      - target: 8761
+        published: 8761
+    networks: 
+      - ez_net
+
+  usr:
+    deploy:
+      replicas: 1
+    build: usr/
+    depends_on:
+      config:
+        condition: service_started
+      discovery:
+        condition: service_started
+      db:  # Fixed indentation here
+        condition: service_started
+    ports:
+      - target: 8081
+        published: 8081
+    networks: 
+      - ez_net
+
+  employment:
+    deploy:
+      replicas: 1
+    build: employment/
+    depends_on:
+      config:
+        condition: service_started
+      discovery:
+        condition: service_started
+      db:  # Fixed indentation here
+        condition: service_started
+    ports:
+      - target: 8082
+        published: 8082
+    networks: 
+      - ez_net
+
+
+  db:
+    deploy:
+      replicas: 1
+    image: mariadb
+    environment:
+      MYSQL_ROOT_PASSWORD: XX_APP_PASSWORD
+      MYSQL_USER: XX_APP_USERNAME
+      MYSQL_PASSWORD: XX_APP_PASSWORD
+      MYSQL_DATABASE: XX_APP_DBNAME
+    ports:
+      - "3306:3306"
+    volumes:
+      - "./XX_APP_NAME.sql:/docker-entrypoint-initdb.d/1.sql"
+    networks:  # Added network declaration for db
+      - ez_net
+
+networks:
+  ez_net:  # Corrected the network name to match the services

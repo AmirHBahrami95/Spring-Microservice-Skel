@@ -1,0 +1,28 @@
+server:
+  port: 8080
+
+#Automatic_Mapping 
+spring:
+  cloud:
+    gateway:
+      discovery.locator:
+        enabled: true
+        lowerCaseServiceId: true
+#     routes:
+#        - id: append_api_version
+#          uri: lb:/**
+#          predicates: 
+#            - Path= /**
+#          filters:
+#            - RewritePath=/(?<path>.*), /api/v1/$\{path}
+#          
+
+#EUREKA
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    fetch-registry: true
+    register-with-eureka: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka

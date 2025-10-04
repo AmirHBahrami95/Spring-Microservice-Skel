@@ -1,0 +1,79 @@
+instance:
+  current_profile: DEV
+server:
+  port: 8082
+spring:
+  devtools:
+    restart:
+      enabled: true
+
+  # DATA SOURCE
+  datasource:
+    url: jdbc:mariadb://localhost:3306/XX_APP_USERNAME
+    driver-class-name: org.mariadb.jdbc.Driver
+    password: XX_APP_USERNAME
+    username: XX_APP_USERNAME
+    validationQuery: SELECT 1
+    testWhileIdle: true
+
+# EUREKA
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    fetch-registry: true
+    register-with-eureka: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+
+# --------------------------------------------------- RESILIENCE4-fucking-J
+
+# CIRCUIT-BREAKER
+resilience4j.circuitbreaker:
+  instances:
+    employmentControllerCircuitBreaker:
+      registerHealthIndicator: true
+      ringBufferSizeInClosedState: 5
+      ringBufferSizeInHalfOpenState: 3
+      waitDurationInOpenState: 10s
+      failureRateThreshold: 50
+      metrics: enabled
+      recordExceptions:
+        - org.springframework.web.client.HttpServerErrorException
+        - java.io.IOException
+        - java.util.concurrent.TimeoutException
+        - org.springframework.web.client.ResourceAccessException
+
+# BULKHEAD
+resilience4j.thread-pool-bulkhead:
+  instances:
+    employmentControllerBulkhead:
+      maxThreadPoolSize: 3
+      coreThreadPoolSize: 1
+      queueCapacity: 3
+      keepAliveDuration: 20ms
+      metrics: enabled
+resilience4j.bulkhead: # semaphore-based (DO NOT REMOVE!)
+  instances:
+    employmentControllerBulkhead:
+      maxWaitDuration: 10ms
+      maxConcurrentCalls: 5
+
+# RETRY
+resilience4j.retry:
+  instances:
+    employmentControllerRetry:
+      maxRetryAttempts: 5
+      waitDuration: 30000
+      metrics: enabled
+      retry-exceptions:
+        - java.util.concurrent.TimeoutException
+
+# RATE-LIMITER
+resilience4j.ratelimiter:
+  instances:
+    employmentControllerRateLimiter:
+      timeoutDuration: 1000ms
+      limitRefreshPeriod: 5000
+      limitForPeriod: 5
+      metrics: enabled
